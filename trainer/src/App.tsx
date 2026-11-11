@@ -1,9 +1,7 @@
-import { useState } from "react";
 import type { TrainingSet } from "./domain";
-import { TaskList } from "./components/TaskList";
-import { TaskCard } from "./components/TaskCard";
+import { AttemptScreen } from "./components/AttemptScreen";
 
-const set1: TrainingSet = {
+const webBasics: TrainingSet = {
   id: "web-basics",
   title: "Основы веб-программирования",
   tasks: [
@@ -28,26 +26,11 @@ const set1: TrainingSet = {
   ],
 };
 
-export default function App() {
-  const [selectedId, setSelectedId] = useState<string>(set1.tasks[0]?.id ?? "");
-
-  const selectedTask = set1.tasks.find((task) => task.id === selectedId);
-
+export function App() {
   return (
     <main>
-      <h1>{set1.title}</h1>
-
-      <TaskList
-        tasks={set1.tasks}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-      />
-
-      {selectedTask ? (
-        <TaskCard task={selectedTask} />
-      ) : (
-        <p>Выберите задание из списка.</p>
-      )}
+      <h1>{webBasics.title}</h1>
+      <AttemptScreen trainingSet={webBasics} />
     </main>
   );
 }

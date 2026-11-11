@@ -46,20 +46,30 @@ export function filterTasksByTopic(tasks: Task[], topic: string): Task[] {
 
 export function countProgress(
   set: TrainingSet,
-  answers: Answer[]
+  answers: Answer[],
 ): { filled: number; total: number } {
   const total = set.tasks.length;
-  let filled = 0; //сколько заполнено 
-
+  let filled = 0;
   for (const task of set.tasks) {
     const answer = answers.find((a) => a.taskId === task.id);
-    if (!answer) continue;
-
-    if (task.kind === "single-choice" && answer.kind === "single-choice") {
+    if (isAnswer(answer)) {
       filled += 1;
-    } else if (task.kind === "short-text" && answer.kind === "short-text") {
-      if (answer.text.trim() !== "") {
-        filled += 1;
-      }}}
+    }
+  }
   return { filled, total };
+}
+
+export type AttemptStatus = "in-progress" | "submitted";
+
+export type AttemptState = {
+  answers: Answer[];
+  currentIndex: number;
+  status: AttemptStatus;
+};
+
+export function isAnswer(answer: Answer | undefined): boolean {
+  if (!answer) return false;
+  return answer.kind === "single-choice"
+    ? answer.optionId.length > 0
+    : answer.text.trim().length > 0;
 }
