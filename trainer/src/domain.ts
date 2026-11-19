@@ -40,6 +40,7 @@ export type Answer = SingleChoiceAnswer | ShortTextAnswer;
 export function findTaskById(tasks: Task[], id: string): Task | undefined {
   return tasks.find((task) => task.id === id);
 }
+
 export function filterTasksByTopic(tasks: Task[], topic: string): Task[] {
   return tasks.filter((task) => task.topic === topic);
 }
@@ -49,27 +50,11 @@ export function countProgress(
   answers: Answer[],
 ): { filled: number; total: number } {
   const total = set.tasks.length;
-  let filled = 0;
-  for (const task of set.tasks) {
-    const answer = answers.find((a) => a.taskId === task.id);
-    if (isAnswer(answer)) {
-      filled += 1;
-    }
-  }
-  return { filled, total };
-}
-
-export type AttemptStatus = "in-progress" | "submitted";
-
-export type AttemptState = {
-  answers: Answer[];
-  currentIndex: number;
-  status: AttemptStatus;
-};
-
-export function isAnswer(answer: Answer | undefined): boolean {
-  if (!answer) return false;
-  return answer.kind === "single-choice"
-    ? answer.optionId.length > 0
-    : answer.text.trim().length > 0;
+  const filled = set.tasks.reduce((n, task) => {
+  const a = answers.find(x => x.taskId === task.id);
+  if (!a) return n;
+  if (a.kind === "single-choice") return a.optionId ? n + 1 : n;
+  return a.text.trim().length > 0 ? n + 1 : n;
+}, 0);
+return { filled, total };
 }
