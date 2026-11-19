@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { TrainingSet } from "./domain";
+import type { Answer, TrainingSet } from "./domain";
+import { findTaskById, countProgress } from "./domain";
 import { TaskList } from "./components/TaskList";
 import { TaskCard } from "./components/TaskCard";
 
@@ -20,34 +21,69 @@ const set1: TrainingSet = {
       ],
     },
     {
+      id: "ts-2",
+      kind: "single-choice",
+      topic: "typescript",
+      prompt: "Что возвращает find, если элемент не найден?",
+      options: [
+        { id: "a", label: "undefined" },
+        { id: "b", label: "Пустой массив" },
+        { id: "c", label: "false" },
+      ],
+    },
+    {
       id: "react-1",
       kind: "short-text",
       topic: "react",
       prompt: "Объясните, чем props компонента отличаются от его состояния.",
     },
+    {
+      id: "http-1",
+      kind: "short-text",
+      topic: "http",
+      prompt: "Что нужно проверить в ответе fetch перед использованием JSON?",
+    },
   ],
 };
 
-export default function App() {
-  const [selectedId, setSelectedId] = useState<string>(set1.tasks[0]?.id ?? "");
+export function App() {
+  const [selectedId, setSelectedId] = useState<string | null>(
+    set1.tasks[0]?.id ?? null,
+  );
 
-  const selectedTask = set1.tasks.find((task) => task.id === selectedId);
+  const selectedTask = selectedId
+    ? findTaskById(set1.tasks, selectedId)
+    : undefined;
+
+  const answers: Answer[] = [];
+  const progress = countProgress(set1, answers);
 
   return (
-    <main>
-      <h1>{set1.title}</h1>
+    <main className="app">
+      <header>
+        <h1 className="app__title">{set1.title}</h1>
+        <p className="app__subtitle">
+          Всего заданий: <strong>{set1.tasks.length}</strong> · Прогресс:{" "}
+          <strong>
+            {progress.filled} из {progress.total}
+          </strong>
+        </p>
+      </header>
 
-      <TaskList
-        tasks={set1.tasks}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-      />
-
-      {selectedTask ? (
-        <TaskCard task={selectedTask} />
-      ) : (
-        <p>Выберите задание из списка.</p>
-      )}
+      <div className="layout">
+        <TaskList
+          tasks={set1.tasks}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+        />
+        <section aria-label="Текущее задание">
+          {selectedTask ? (
+            <TaskCard task={selectedTask} />
+          ) : (
+            <p className="muted">Выберите задание.</p>
+          )}
+        </section>
+      </div>
     </main>
   );
 }

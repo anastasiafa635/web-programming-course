@@ -40,6 +40,7 @@ export type Answer = SingleChoiceAnswer | ShortTextAnswer;
 export function findTaskById(tasks: Task[], id: string): Task | undefined {
   return tasks.find((task) => task.id === id);
 }
+
 export function filterTasksByTopic(tasks: Task[], topic: string): Task[] {
   return tasks.filter((task) => task.topic === topic);
 }
